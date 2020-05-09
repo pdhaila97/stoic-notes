@@ -47,12 +47,12 @@ userSchema.pre("save", async function(this: typeof userSchema, next: NextFunctio
 
 userSchema.statics.findByCredentials = async (email: string, password: string) => {
     try {
-        const user: typeof userSchema = User.findOne({email});
+        const user: typeof userSchema = await User.findOne({email});
         if(!user) {
             throw new Error('unable to login');
         }
 
-        const isPasswordMatch = bcrypt.compare(password, user.password);
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
         if(!isPasswordMatch) {
             throw new Error('unable to login');
         }
@@ -60,7 +60,7 @@ userSchema.statics.findByCredentials = async (email: string, password: string) =
         return user;
 
     } catch (err) {
-        return err;
+        throw new Error(err);
     }
 }
 

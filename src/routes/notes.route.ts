@@ -1,15 +1,17 @@
-import express from 'express';
+import express, { Request } from 'express';
 import Note from '../models/notes.model';
+import auth from '../middlewares/auth.middleware';
 
 
 
 const router = express.Router();
 
 // Create a note
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req: any, res: any) => {
     try {
 
-        const note = new Note(req.body);
+        const note: any = new Note(req.body);
+        note.owner = req.user._id;
         await note.save();
         res.send(note);
 
@@ -21,11 +23,11 @@ router.post("/", async (req, res) => {
 });
 
 // Get all notes
-router.get("/", async (req, res) => {
+router.get("/", auth, async (req: any, res: any) => {
     try {
 
-        const notes = await Note.find({});
-        if(notes) {
+        const notes = await Note.find({owner: req.user._id});
+        if(notes && notes.length > 0) {
             return res.send(notes);
         }
 
@@ -39,11 +41,11 @@ router.get("/", async (req, res) => {
 });
 
 // Get note by ID
-router.get("/:id", async (req, res) => {
+router.get("/:id", auth, async (req: any, res: any) => {
     try {
         
         const _id = req.params.id;
-        const note = await Note.findById(_id);
+        const note = await Note.find({_id, owner: req.user._id});
         if(note) {
             return res.send(note);
         }
@@ -58,12 +60,12 @@ router.get("/:id", async (req, res) => {
 });
 
 // Update note by ID
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", auth, async (req: any, res: any) => {
 
     try {
         
         const _id = req.params.id;
-        let note: any = await Note.findById(_id);
+        let note: any = await Note.find({_id, owner: req.user._id});
         const updates = Object.keys(req.body);
 
         updates.forEach(update => {
@@ -92,12 +94,12 @@ router.patch("/:id", async (req, res) => {
 });
 
 // Delete Note by ID
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req:any, res: any) => {
 
     try {
         
         const _id = req.params.id;
-        const note = Note.findByIdAndDelete(_id);
+        const note = Note.findOne({_id, owner: req.user._id});
         if(!note) {
             return res.status(404).send();
         }

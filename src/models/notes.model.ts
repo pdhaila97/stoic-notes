@@ -1,4 +1,5 @@
-import mongoose from 'mongoose';
+import mongoose, { SchemaType, Schema, SchemaTypes } from 'mongoose';
+import User from './users.model';
 
 
 const metaSchema = new mongoose.Schema({
@@ -32,8 +33,19 @@ const notesSchema = new mongoose.Schema({
     },
     meta: {
         type: metaSchema
+    },
+    owner: {
+        type: Schema.Types.ObjectId,
+        ref: User,
+        required: true
     }
-});
+}, {timestamps: true});
+
+notesSchema.methods.toJSON = function() {
+    const note = this.toObject();
+    delete note.owner;
+    return note;
+}
 
 const Note = mongoose.model("Note", notesSchema);
 

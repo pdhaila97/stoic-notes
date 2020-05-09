@@ -1,5 +1,6 @@
 import express from 'express';
 import User from '../models/users.model'
+import auth from '../middlewares/auth.middleware';
 
 const router = express.Router();
 
@@ -10,7 +11,7 @@ router.post("/", async (req, res) => {
         const user = new User(req.body);
         await user.save();
         const token = await user.getAuthToken();
-        res.send({user, token});
+        res.status(201).send({user, token});
     } catch (err) {
         res.status(500).send({err});
     }
@@ -18,7 +19,7 @@ router.post("/", async (req, res) => {
 });
 
 
-//Get User info
+// Login User
 router.post("/login", async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password);
@@ -33,6 +34,27 @@ router.post("/login", async (req, res) => {
     } catch (err) {
         res.status(500).send(err);
     }
+});
+
+
+// Logout User
+router.post("/logout", auth, async (req: any, res: any) => {
+    try {
+        const user = req.user;
+        if(!user) {
+            return res.status(404).send();
+        }
+        const logoutAll = req.query.all !== undefined;
+        user.tokens = logoutAll ? [] : user.tokens.filter((token: any) => {
+            return token.token !== req.token;
+        });
+
+        await user.save();
+        res.send(user);
+    } catch (err) {
+        res.status(500).send();
+    }
+
 });
 
 
