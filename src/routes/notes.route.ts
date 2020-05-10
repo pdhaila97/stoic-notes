@@ -45,7 +45,7 @@ router.get("/:id", auth, async (req: any, res: any) => {
     try {
         
         const _id = req.params.id;
-        const note = await Note.find({_id, owner: req.user._id});
+        const note = await Note.findOne({_id, owner: req.user._id});
         if(note) {
             return res.send(note);
         }
@@ -65,7 +65,7 @@ router.patch("/:id", auth, async (req: any, res: any) => {
     try {
         
         const _id = req.params.id;
-        let note: any = await Note.find({_id, owner: req.user._id});
+        let note: any = await Note.findOne({_id, owner: req.user._id});
         const updates = Object.keys(req.body);
 
         updates.forEach(update => {
