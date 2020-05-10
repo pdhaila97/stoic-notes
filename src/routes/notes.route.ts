@@ -99,7 +99,7 @@ router.delete("/:id", auth, async (req:any, res: any) => {
     try {
         
         const _id = req.params.id;
-        const note = Note.findOne({_id, owner: req.user._id});
+        const note = await Note.findOneAndDelete({_id, owner: req.user._id});
         if(!note) {
             return res.status(404).send();
         }
