@@ -32,7 +32,12 @@ const notesSchema = new mongoose.Schema({
         trim: true
     },
     meta: {
-        type: metaSchema
+        type: metaSchema,
+        default: {
+            isCompleted: false,
+            isArchived: false,
+            importance: 1
+        }
     },
     owner: {
         type: Schema.Types.ObjectId,

@@ -73,6 +73,9 @@ router.patch("/:id", auth, async (req: any, res: any) => {
                 note[update] = req.body[update];
             } else {
                 Object.keys(req.body[update]).forEach( metaUpdate => {
+                    if(!note[update]) {
+                        note[update] = {};
+                    }
                     note[update][metaUpdate] = req.body[update][metaUpdate];
                 })
             }
