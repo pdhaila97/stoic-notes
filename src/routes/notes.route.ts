@@ -35,8 +35,7 @@ router.get("/", auth, async (req: any, res: any) => {
         const showArchive = req.query.showArchive ? req.query.showArchive === 'true' : true;
         const findOptions: any = {};
         if(!showArchive) {
-            findOptions.meta = {};
-            findOptions.meta.isArchived = false;
+            findOptions["meta.isArchived"] = false;
         }
         const notes = await Note.find({owner: req.user._id, ...findOptions}).collation({locale: 'en'}).sort(sort);
         if(notes && notes.length > 0) {
