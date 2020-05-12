@@ -25,8 +25,20 @@ router.post("/", auth, async (req: any, res: any) => {
 // Get all notes
 router.get("/", auth, async (req: any, res: any) => {
     try {
-
-        const notes = await Note.find({owner: req.user._id});
+        const sort: any = {};
+        if(req.query.sortAsc) {
+            const sortAscArr = req.query.sortAsc.split(',');
+            sortAscArr.forEach((elem: any) => {
+                sort[elem] = 1;
+            });
+        }
+        const showArchive = req.query.showArchive ? req.query.showArchive === 'true' : true;
+        const findOptions: any = {};
+        if(!showArchive) {
+            findOptions.meta = {};
+            findOptions.meta.isArchived = false;
+        }
+        const notes = await Note.find({owner: req.user._id, ...findOptions}).collation({locale: 'en'}).sort(sort);
         if(notes && notes.length > 0) {
             return res.send(notes);
         }
